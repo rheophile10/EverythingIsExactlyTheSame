@@ -39,9 +39,10 @@ module MetaData
     type Database = 
         | SQLServer
         | Postgres
+        | SQLite
 
     type Metadata = {
         connectionStringEnvKey: string
-        TypesToTables: Map<Type, TableMetadata>
+        TypesToTables: Map<Type, TableMetadata> option
         database: Database
     }
