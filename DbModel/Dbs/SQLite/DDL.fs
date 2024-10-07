@@ -42,7 +42,7 @@ module DDL =
 
         sprintf "CREATE TABLE IF NOT EXISTS %s (\n%s\n);" table.TableName columnsSql
 
-    let createTables (dbMetadata: DatabaseMetadata) =
+    let createTables (dbMetadata: Metadata) =
         let connString = dbMetadata.connectionStringEnvKey
         use conn = new SQLiteConnection(connString)
         conn.Open()

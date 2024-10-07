@@ -5,6 +5,16 @@ module Ops
     open DBModel.MetaData
     open DBModel.Env
     
+    open System.Text.Json
+    open System.Data  
+    open System.Collections.Generic
+
+    type OutData =
+        | Reader of IDataReader
+        | DataTable of DataTable
+        | Collection of List<Dictionary<string, obj>>
+        | Json of string
+    
     open DBModel.Dbs.Postgres.DQL
     open DBModel.Dbs.SQLite.DQL
     open DBModel.Dbs.SQLServer.DQL
@@ -73,7 +83,7 @@ module Ops
     open DBModel.Dbs.SQLServer.DDL
 
     let ddl
-        (dbMetadata: DbModel.MetaData.DatabaseMetadata)
+        (dbMetadata: DbModel.MetaData.Metadata)
         (dbType: DbModel.MetaData.Database)
         =
     

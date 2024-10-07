@@ -42,7 +42,7 @@ module DDL =
 
         sprintf "CREATE TABLE %s (\n%s\n);" table.TableName columnsSql
 
-    let createTables (dbMetadata: DatabaseMetadata) =
+    let createTables (dbMetadata: Metadata) =
         let connString = dbMetadata.connectionStringEnvKey
         use conn = new SqlConnection(connString)
         conn.Open()

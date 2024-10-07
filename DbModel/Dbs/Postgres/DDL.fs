@@ -45,7 +45,7 @@ module DDL =
     open Npgsql.FSharp
     open DbModel.MetaData
 
-    let createTables (dbMetadata: DatabaseMetadata) =
+    let createTables (dbMetadata: Metadata) =
         let connString = Connection.getConnectionString()
         let connection = Sql.connect connString
 

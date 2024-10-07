@@ -40,19 +40,8 @@ module MetaData
         | SQLServer
         | Postgres
 
-    type DatabaseMetadata = {
+    type Metadata = {
         connectionStringEnvKey: string
         TypesToTables: Map<Type, TableMetadata>
         database: Database
     }
-
-    open System.Text.Json
-    open System.Data  
-    open System.Collections.Generic
-
-    type OutData =
-        | Reader of IDataReader
-        | DataTable of DataTable
-        | Collection of List<Dictionary<string, obj>>
-        | Json of string
-        
