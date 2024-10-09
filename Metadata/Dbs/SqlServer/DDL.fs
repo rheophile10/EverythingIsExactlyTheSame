@@ -8,7 +8,7 @@ module DDL =
     let private sqlColumnTypeToSqlServerType (colType: SqlColumnType) =
         match colType with
         | Int _ -> "INT"
-        | String Some maxLength -> sprintf "NVARCHAR(%d)" maxLength
+        | String (Some maxLength) -> sprintf "NVARCHAR(%d)" maxLength
         | String None -> "NVARCHAR(MAX)"
         | Bool -> "BIT"
         | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
@@ -49,11 +49,14 @@ module DDL =
         use conn = new SqlConnection(connString)
         conn.Open()
 
-        dbMetadata.TypesToTables
-        |> Map.iter (fun _ table ->
-            let script = generateCreateTableScript table
-            use cmd = new SqlCommand(script, conn)
-            cmd.ExecuteNonQuery() |> ignore
-        )
+        match dbMetadata.TypesToTables with
+        | Some typesToTables ->
+            typesToTables
+            |> Map.iter (fun _ table ->
+                let script = generateCreateTableScript table
+                use cmd = new SqlCommand(script, conn)
+                cmd.ExecuteNonQuery() |> ignore
+            )
+        | None -> printfn "No table metadata available."
         
         conn.Close()

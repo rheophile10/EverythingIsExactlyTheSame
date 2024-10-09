@@ -1,14 +1,14 @@
-namespace Metadata.Dbs.SQLite
+namespace Metadata.Dbs.Sqlite
 
 module DDL =
 
     open Metadata.Metadata
     open Metadata.Env
 
-    let private sqlColumnTypeToSQLiteType (colType: SqlColumnType) =
+    let private sqlColumnTypeToSqliteType (colType: SqlColumnType) =
         match colType with
         | Int _ -> "INTEGER"
-        | String Some maxLength -> sprintf "VARCHAR(%d)" maxLength
+        | String (Some maxLength) -> sprintf "VARCHAR(%d)" maxLength
         | String None -> "TEXT"
         | Bool -> "BOOLEAN"
         | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
@@ -25,7 +25,7 @@ module DDL =
         let columnsSql =
             table.Columns
             |> List.map (fun col ->
-                let dataType = sqlColumnTypeToSQLiteType col.DataType
+                let dataType = sqlColumnTypeToSqliteType col.DataType
                 let nullable = if col.Nullable then "" else "NOT NULL"
                 let constraints =
                     col.Constraints
@@ -42,18 +42,21 @@ module DDL =
 
         sprintf "CREATE TABLE IF NOT EXISTS %s (\n%s\n);" table.TableName columnsSql
 
-    open Microsoft.Data.SQLite
+    open Microsoft.Data.Sqlite
 
     let createTables (dbMetadata: Metadata) =
         let connString = getConnectionString dbMetadata.connectionStringEnvKey
-        use conn = new SQLiteConnection(connString)
+        use conn = new SqliteConnection(connString)
         conn.Open()
 
-        dbMetadata.TypesToTables
-        |> Map.iter (fun _ table ->
-            let script = generateCreateTableScript table
-            use cmd = new SQLiteCommand(script, conn)
-            cmd.ExecuteNonQuery() |> ignore
-        )
+        match dbMetadata.TypesToTables with
+        | Some typesToTables ->
+            typesToTables
+            |> Map.iter (fun _ table ->
+                let script = generateCreateTableScript table
+                use cmd = new SqliteCommand(script, conn)
+                cmd.ExecuteNonQuery() |> ignore
+            )
+        | None -> printfn "No table metadata available."
         
         conn.Close()

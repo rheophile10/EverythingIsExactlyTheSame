@@ -1,19 +1,19 @@
-namespace Metadata.Dbs.SQLite
+namespace Metadata.Dbs.Sqlite
 
 module DML =
 
     open System.Data
-    open Microsoft.Data.SQLite
+    open Microsoft.Data.Sqlite
     open Metadata.Metadata
     open System.Text
     open System
 
-    let bulkLoadData
+    let bulkLoad
         (connString: string)
         (table: TableMetadata)
         (reader: IDataReader) =
 
-        use conn = new SQLiteConnection(connString)
+        use conn = new SqliteConnection(connString)
         conn.Open()
 
         use transaction = conn.BeginTransaction()
@@ -23,10 +23,10 @@ module DML =
 
         let insertCommandText = sprintf "INSERT INTO %s (%s) VALUES (%s)" table.TableName columns placeholders
 
-        use cmd = new SQLiteCommand(insertCommandText, conn, transaction)
+        use cmd = new SqliteCommand(insertCommandText, conn, transaction)
 
         for col in table.Columns do
-            cmd.Parameters.Add(new SQLiteParameter()) |> ignore
+            cmd.Parameters.Add(new SqliteParameter()) |> ignore
 
         while reader.Read() do
             for i in 0 .. table.Columns.Length - 1 do
@@ -41,9 +41,9 @@ module DML =
         reader.Close()
 
     let executeNonQuery (connString: string) (query: string) =
-        use conn = new SQLiteConnection(connString)
+        use conn = new SqliteConnection(connString)
         conn.Open()
 
-        use cmd = new SQLiteCommand(query, conn)
+        use cmd = new SqliteCommand(query, conn)
         cmd.ExecuteNonQuery() |> ignore
         conn.Close()

@@ -11,9 +11,9 @@
       <Compile Include="Dbs\Postgres\DDL.fs" />
       <Compile Include="Dbs\Postgres\DML.fs" />
       <Compile Include="Dbs\Postgres\DQL.fs" />
-      <Compile Include="Dbs\SQLite\DDL.fs" />
-      <Compile Include="Dbs\SQLite\DML.fs" />
-      <Compile Include="Dbs\SQLite\DQL.fs" />
+      <Compile Include="Dbs\Sqlite\DDL.fs" />
+      <Compile Include="Dbs\Sqlite\DML.fs" />
+      <Compile Include="Dbs\Sqlite\DQL.fs" />
       <Compile Include="Dbs\SqlServer\DDL.fs" />
       <Compile Include="Dbs\SqlServer\DML.fs" />
       <Compile Include="Dbs\SqlServer\DQL.fs" />
@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
     <PackageReference Include="Npgsql" Version="8.0.4" />
     <PackageReference Include="Npgsql.FSharp" Version="5.7.0" />
   </ItemGroup>

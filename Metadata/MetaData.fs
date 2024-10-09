@@ -37,9 +37,9 @@ module Metadata =
     }
 
     type Database = 
-        | SQLServer
+        | SqlServer
         | Postgres
-        | SQLite
+        | Sqlite
 
     open System
 

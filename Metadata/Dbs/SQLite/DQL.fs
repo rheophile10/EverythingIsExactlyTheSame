@@ -1,29 +1,29 @@
-namespace Metadata.Dbs.SQLite
+namespace Metadata.Dbs.Sqlite
 
-module Query =
+module DQL =
 
     open System.Text.Json
     open System.Data
-    open Microsoft.Data.SQLite
+    open Microsoft.Data.Sqlite
     open System.Collections.Generic
 
-    let getReader (connString: string) (query: string) (parameters: (string * obj) list) : SQLiteDataReader =
-        let conn = new SQLiteConnection(connString)
+    let getReader (connString: string) (query: string) (parameters: (string * obj) list) : SqliteDataReader =
+        let conn = new SqliteConnection(connString)
         conn.Open()
 
-        let cmd = new SQLiteCommand(query, conn)
+        let cmd = new SqliteCommand(query, conn)
         parameters |> List.iter (fun (name, value) -> cmd.Parameters.AddWithValue(name, value) |> ignore)
 
         let reader = cmd.ExecuteReader()
         reader
 
-    let convertReaderToDataTable (reader: SQLiteDataReader) : DataTable =
+    let convertReaderToDataTable (reader: SqliteDataReader) : DataTable =
         let dataTable = new DataTable()
         dataTable.Load(reader) 
         reader.Close() 
         dataTable
 
-    let convertReaderToCollection (reader: SQLiteDataReader) : List<Dictionary<string, obj>> =
+    let convertReaderToCollection (reader: SqliteDataReader) : List<Dictionary<string, obj>> =
         let readRow (reader: IDataReader) =
             let dict = Dictionary<string, obj>()
             for i in 0 .. reader.FieldCount - 1 do
@@ -36,5 +36,5 @@ module Query =
         reader.Close() 
         listOfRows
 
-    let convertReaderToJson (reader: SQLiteDataReader) : string =
+    let convertReaderToJson (reader: SqliteDataReader) : string =
         JsonSerializer.Serialize(convertReaderToCollection reader)

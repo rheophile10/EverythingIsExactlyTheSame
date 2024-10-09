@@ -8,7 +8,7 @@ module DML =
     open System.Data
     open Metadata.Metadata
 
-    let bulkLoadData
+    let bulkLoad
         (connString: string)
         (table: TableMetadata) 
         (reader: IDataReader) =
