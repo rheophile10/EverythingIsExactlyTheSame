@@ -1,6 +1,6 @@
-﻿namespace DbModel
+﻿namespace Metadata
 
-module MetaData
+module Metadata =
 
     type Constraint =
         | PrimaryKey
@@ -41,8 +41,13 @@ module MetaData
         | Postgres
         | SQLite
 
+    open System
+
+// let myType = typeof<MyType>
+// let typeName = myType.FullName
+
     type Metadata = {
-        connectionStringEnvKey: string
-        TypesToTables: Map<Type, TableMetadata> option
+        connectionStringEnvKey: string        
+        TypesToTables: Map<string, TableMetadata> option
         database: Database
     }

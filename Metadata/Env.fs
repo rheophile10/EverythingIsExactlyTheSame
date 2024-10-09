@@ -1,10 +1,10 @@
-namespace DbModel
+namespace Metadata
 
-module Env
+module Env =
     
     open DotNetEnv
 
-    let getConnectionString (connectionStringEnvKey:string) =
-        DotNetEnv.Env.Load()
+    let getConnectionString (connectionStringEnvKey:string): string =
+        DotNetEnv.Env.Load() |> ignore
         let connString = DotNetEnv.Env.GetString(connectionStringEnvKey)
         connString

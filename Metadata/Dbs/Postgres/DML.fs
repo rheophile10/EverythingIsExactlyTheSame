@@ -1,11 +1,12 @@
-namespace DbModel.Dbs.Postgres
+namespace Metadata.Dbs.Postgres
 
 module DML =
 
     open Npgsql
     open Npgsql.FSharp
+    open System
     open System.Data
-    open DbModel.MetaData
+    open Metadata.Metadata
 
     let bulkLoadData
         (connString: string)
@@ -28,7 +29,7 @@ module DML =
                 else
                     writer.Write(value)
 
-        writer.Complete()
+        writer.Complete() |> ignore
         conn.Close()
 
     let executeNonQuery (connString: string) (query: string) =

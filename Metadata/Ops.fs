@@ -1,9 +1,9 @@
-namespace DBModel
+namespace Metadata
 
-module Ops
+module Ops =
     
-    open DBModel.MetaData
-    open DBModel.Env
+    open Metadata.MetaData
+    open Metadata.Env
     
     open System.Text.Json
     open System.Data  
@@ -15,79 +15,79 @@ module Ops
         | Collection of List<Dictionary<string, obj>>
         | Json of string
     
-    open DBModel.Dbs.Postgres.DQL
-    open DBModel.Dbs.SQLite.DQL
-    open DBModel.Dbs.SQLServer.DQL
+    open Metadata.Dbs.Postgres.DQL
+    open Metadata.Dbs.SQLite.DQL
+    open Metadata.Dbs.SQLServer.DQL
     
     let dql 
         (connString: string) 
         (query: string) 
         (parameters: (string * obj) list) 
-        (dbType: DbModel.MetaData.Database)
-        (outData: DbModel.MetaData.OutData)
-        : DbModel.MetaData.OutData =
+        (dbType: Metadata.MetaData.Database)
+        (outData: Metadata.MetaData.OutData)
+        : Metadata.MetaData.OutData =
     
         match dbType with
         | Postgres ->
-            let reader = DBModel.Dbs.Postgres.DQL.getReader connString query parameters
+            let reader = Metadata.Dbs.Postgres.DQL.getReader connString query parameters
             match outData with
             | Reader -> reader
-            | DataTable -> DBModel.Dbs.Postgres.DQL.convertReaderToDataTable reader
-            | Collection -> DBModel.Dbs.Postgres.DQL.convertReaderToCollection reader
-            | Json -> DBModel.Dbs.Postgres.DQL.convertReaderToJson reader
+            | DataTable -> Metadata.Dbs.Postgres.DQL.convertReaderToDataTable reader
+            | Collection -> Metadata.Dbs.Postgres.DQL.convertReaderToCollection reader
+            | Json -> Metadata.Dbs.Postgres.DQL.convertReaderToJson reader
         | SQLite ->
-            let reader = DBModel.Dbs.SQLite.DQL.getReader connString query parameters
+            let reader = Metadata.Dbs.SQLite.DQL.getReader connString query parameters
             match outData with
             | Reader -> reader
-            | DataTable -> DBModel.Dbs.SQLite.DQL.convertReaderToDataTable reader
-            | Collection -> DBModel.Dbs.SQLite.DQL.convertReaderToCollection reader
-            | Json -> DBModel.Dbs.SQLite.DQL.convertReaderToJson reader
+            | DataTable -> Metadata.Dbs.SQLite.DQL.convertReaderToDataTable reader
+            | Collection -> Metadata.Dbs.SQLite.DQL.convertReaderToCollection reader
+            | Json -> Metadata.Dbs.SQLite.DQL.convertReaderToJson reader
         | SQLServer ->
-            let reader = DBModel.Dbs.SQLServer.DQL.getReader connString query parameters
+            let reader = Metadata.Dbs.SQLServer.DQL.getReader connString query parameters
             match outData with
             | Reader -> reader
-            | DataTable -> DBModel.Dbs.SQLServer.DQL.convertReaderToDataTable reader
-            | Collection -> DBModel.Dbs.SQLServer.DQL.convertReaderToCollection reader
-            | Json -> DBModel.Dbs.SQLServer.DQL.convertReaderToJson reader
+            | DataTable -> Metadata.Dbs.SQLServer.DQL.convertReaderToDataTable reader
+            | Collection -> Metadata.Dbs.SQLServer.DQL.convertReaderToCollection reader
+            | Json -> Metadata.Dbs.SQLServer.DQL.convertReaderToJson reader
 
-    open DBModel.Dbs.Postgres.DML
-    open DBModel.Dbs.SQLite.DML
-    open DBModel.Dbs.SQLServer.DML
+    open Metadata.Dbs.Postgres.DML
+    open Metadata.Dbs.SQLite.DML
+    open Metadata.Dbs.SQLServer.DML
 
     let bulkLoad
         (connString: string) 
         (table: TableMetadata)
         (reader: IDataReader)
-        (dbType: DbModel.MetaData.Database)
+        (dbType: Metadata.MetaData.Database)
         =
     
         match dbType with
-        | Postgres -> DBModel.Dbs.Postgres.DML.bulkLoad connString table reader
-        | SQLite -> DBModel.Dbs.SQLite.DML.bulkLoad connString table reader
-        | SQLServer -> DBModel.Dbs.SQLServer.DML.bulkLoad connString table reader
+        | Postgres -> Metadata.Dbs.Postgres.DML.bulkLoad connString table reader
+        | SQLite -> Metadata.Dbs.SQLite.DML.bulkLoad connString table reader
+        | SQLServer -> Metadata.Dbs.SQLServer.DML.bulkLoad connString table reader
 
     let dml
         (connString: string) 
         (query: string) 
         (parameters: (string * obj) list) 
-        (dbType: DbModel.MetaData.Database)
+        (dbType: Metadata.MetaData.Database)
         =
     
         match dbType with
-        | Postgres -> DBModel.Dbs.Postgres.DML.executeNonQuery connString query
-        | SQLite -> DBModel.Dbs.SQLite.DML.executeNonQuery connString query
-        | SQLServer -> DBModel.Dbs.SQLServer.DML.executeNonQuery connString query
+        | Postgres -> Metadata.Dbs.Postgres.DML.executeNonQuery connString query
+        | SQLite -> Metadata.Dbs.SQLite.DML.executeNonQuery connString query
+        | SQLServer -> Metadata.Dbs.SQLServer.DML.executeNonQuery connString query
         
-    open DBModel.Dbs.Postgres.DDL
-    open DBModel.Dbs.SQLite.DDL
-    open DBModel.Dbs.SQLServer.DDL
+    open Metadata.Dbs.Postgres.DDL
+    open Metadata.Dbs.SQLite.DDL
+    open Metadata.Dbs.SQLServer.DDL
 
     let ddl
-        (dbMetadata: DbModel.MetaData.Metadata)
-        (dbType: DbModel.MetaData.Database)
+        (dbMetadata: Metadata.MetaData.Metadata)
+        (dbType: Metadata.MetaData.Database)
         =
     
         match dbType with
-        | Postgres -> DBModel.Dbs.Postgres.DDL.createTables dbMetadata
-        | SQLite -> DBModel.Dbs.SQLite.DDL.createTables dbMetadata
-        | SQLServer -> DBModel.Dbs.SQLServer.DDL.createTables dbMetadata
+        | Postgres -> Metadata.Dbs.Postgres.DDL.createTables dbMetadata
+        | SQLite -> Metadata.Dbs.SQLite.DDL.createTables dbMetadata
+        | SQLServer -> Metadata.Dbs.SQLServer.DDL.createTables dbMetadata

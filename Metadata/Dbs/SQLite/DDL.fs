@@ -1,9 +1,9 @@
-namespace DbModel.Dbs.SQLite
+namespace Metadata.Dbs.SQLite
 
 module DDL =
 
-    open DbModel.MetaData
-    open System.Data.SQLite
+    open Metadata.Metadata
+    open Metadata.Env
 
     let private sqlColumnTypeToSQLiteType (colType: SqlColumnType) =
         match colType with
@@ -42,8 +42,10 @@ module DDL =
 
         sprintf "CREATE TABLE IF NOT EXISTS %s (\n%s\n);" table.TableName columnsSql
 
+    open Microsoft.Data.SQLite
+
     let createTables (dbMetadata: Metadata) =
-        let connString = dbMetadata.connectionStringEnvKey
+        let connString = getConnectionString dbMetadata.connectionStringEnvKey
         use conn = new SQLiteConnection(connString)
         conn.Open()
 

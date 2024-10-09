@@ -1,10 +1,10 @@
-namespace DbModel.Dbs.SqlServer
+namespace Metadata.Dbs.SqlServer
 
 module DML =
 
     open System.Data
-    open System.Data.SqlClient
-    open DbModel.MetaData
+    open Microsoft.Data.SqlClient
+    open Metadata.Metadata
 
     let bulkLoadData
         (connString: string)

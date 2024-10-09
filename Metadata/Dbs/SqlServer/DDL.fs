@@ -1,9 +1,9 @@
-namespace DbModel.Dbs.SqlServer
+namespace Metadata.Dbs.SqlServer
 
 module DDL =
 
-    open DbModel.MetaData
-    open System.Data.SqlClient
+    open Metadata.Metadata
+    open Microsoft.Data.SqlClient
 
     let private sqlColumnTypeToSqlServerType (colType: SqlColumnType) =
         match colType with
@@ -42,8 +42,10 @@ module DDL =
 
         sprintf "CREATE TABLE %s (\n%s\n);" table.TableName columnsSql
 
+    open Metadata.Env
+
     let createTables (dbMetadata: Metadata) =
-        let connString = dbMetadata.connectionStringEnvKey
+        let connString = getConnectionString dbMetadata.connectionStringEnvKey
         use conn = new SqlConnection(connString)
         conn.Open()
 

@@ -1,11 +1,12 @@
-namespace DbModel.Dbs.SQLite
+namespace Metadata.Dbs.SQLite
 
 module DML =
 
     open System.Data
-    open System.Data.SQLite
-    open DbModel.MetaData
+    open Microsoft.Data.SQLite
+    open Metadata.Metadata
     open System.Text
+    open System
 
     let bulkLoadData
         (connString: string)

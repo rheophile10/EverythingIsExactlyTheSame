@@ -1,14 +1,14 @@
-
-namespace DbModel.Dbs.Postgres
+namespace Metadata.Dbs.Postgres
 
 module DDL =
 
-    open DbModel.MetaData
+    open Metadata.Metadata
+    open Metadata.Env
 
     let private sqlColumnTypeToPostgresType (colType: SqlColumnType) =
         match colType with
         | Int _ -> "INTEGER"
-        | String Some maxLength -> sprintf "VARCHAR(%d)" maxLength
+        | String  (Some maxLength) -> sprintf "VARCHAR(%d)" maxLength
         | String None -> "TEXT"
         | Bool -> "BOOLEAN"
         | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
@@ -43,17 +43,20 @@ module DDL =
         sprintf "CREATE TABLE IF NOT EXISTS %s (\n%s\n);" table.TableName columnsSql
 
     open Npgsql.FSharp
-    open DbModel.MetaData
 
     let createTables (dbMetadata: Metadata) =
-        let connString = Connection.getConnectionString()
+        let connString = getConnectionString dbMetadata.connectionStringEnvKey
         let connection = Sql.connect connString
 
-        dbMetadata.TypesToTables
-        |> Map.iter (fun _ table ->
-            let script = generateCreateTableScript table
-            connection
-            |> Sql.query script
-            |> Sql.executeNonQuery
-            |> ignore
-        )
+        match dbMetadata.TypesToTables with
+        | Some typesToTables ->
+            typesToTables
+            |> Map.iter (fun _ table ->
+                let script = generateCreateTableScript table
+                connection
+                |> Sql.query script
+                |> Sql.executeNonQuery
+                |> ignore
+            )
+        | None ->
+            printfn "No table metadata available."

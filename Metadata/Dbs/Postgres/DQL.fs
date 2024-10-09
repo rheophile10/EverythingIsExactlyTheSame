@@ -1,4 +1,4 @@
-namespace DbModel.Dbs.Postgres
+namespace Metadata.Dbs.Postgres
 
 module DQL =
 
@@ -7,7 +7,7 @@ module DQL =
     open System.Collections.Generic
     open Npgsql
 
-    let getReader (connString: string) (query: string) (parameters: (string * obj) list) : NpgsqlDataReader =
+    let getReader (connString: string) (query: string) (parameters: (string * obj) list) : Common.DbDataReader =
         let conn = new NpgsqlConnection(connString)
         conn.Open()
 
@@ -19,7 +19,7 @@ module DQL =
 
     let convertReaderToDataTable (reader: NpgsqlDataReader): DataTable =
         let dataTable = new DataTable()
-        dataTable.Load(npgReader)
+        dataTable.Load(reader)
         reader.Close()
         dataTable
 

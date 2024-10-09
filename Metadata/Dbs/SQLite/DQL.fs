@@ -1,10 +1,10 @@
-namespace DbModel.Dbs.SQLite
+namespace Metadata.Dbs.SQLite
 
 module Query =
 
     open System.Text.Json
     open System.Data
-    open System.Data.SQLite
+    open Microsoft.Data.SQLite
     open System.Collections.Generic
 
     let getReader (connString: string) (query: string) (parameters: (string * obj) list) : SQLiteDataReader =

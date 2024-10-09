@@ -1,10 +1,10 @@
-namespace DbModel.Dbs.SqlServer
+namespace Metadata.Dbs.SqlServer
 
 module DQL =
 
     open System.Text.Json
     open System.Data
-    open System.Data.SqlClient
+    open Microsoft.Data.SqlClient
     open System.Collections.Generic
 
     let getReader (connString: string) (query: string) (parameters: (string * obj) list) : SqlDataReader =
