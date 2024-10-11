@@ -2,3 +2,4 @@ obj
 .env
 dbs
 *.sln
+bin

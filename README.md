@@ -36,6 +36,6 @@ type DbContextName(options: DbContextOptions<DbContextName>) =
 
 ```
 
-But I _hate_ the idea that I have to use an EF Core CLI tool to do migrations and things. I don't like the idea of doing data model versioning outside of git either.
+But I don't like that I have to use an EF Core CLI tool to do migrations and things. I don't like the idea of doing data model versioning outside of git either.
 
-Metadata has never been more important than it is right now.
+Metadata is important.
