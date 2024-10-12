@@ -2,6 +2,8 @@
 
 This is an inappropriate experiment to explore DB data access Fsharp. I wanted something that was like the big ddl.sql files of .sqlproj but didn't use any OOP EF Core.
 
+look what they make us do
+
 ```
 open System
 open System.ComponentModel.DataAnnotations
@@ -9,24 +11,24 @@ open System.ComponentModel.DataAnnotations.Schema
 
 [<CLIMutable>] \\ gross tags on an #f type explicitly even mentioning mutability
 type Customer = {
-    [<Key>]
+    [<Key>] \\ another hideous tag
     Id: int
     Name: string
     Email: string
 }
 
-open Microsoft.EntityFrameworkCore
+open Microsoft.EntityFrameworkCore \\ unnecessary abstraction
 open MyFSharpDataAccess.Models
 
 type DbContextName(options: DbContextOptions<DbContextName>) =
-    inherit DbContext(options)
+    inherit DbContext(options) \\ disgusting
 
-    [<DefaultValue>]
+    [<DefaultValue>] \\ again ew
     val mutable customers: DbSet<Customer>
     member this.Customers with get() = this.customers and set v = this.customers <- v
 
     override _.OnModelCreating(modelBuilder: ModelBuilder) =
-        base.OnModelCreating(modelBuilder)
+        base.OnModelCreating(modelBuilder) \\ override ew
 
 ```
 
