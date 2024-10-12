@@ -5,21 +5,23 @@ module DDL =
     open Metadata.Metadata
     open Metadata.Env
 
-    let private sqlColumnTypeToPostgresType (colType: SqlColumnType) =
+    let private sqlColumnTypeToPostgresType (colType: SqlType) =
         match colType with
         | Int _ -> "INTEGER"
-        | String  (Some maxLength) -> sprintf "VARCHAR(%d)" maxLength
-        | String None -> "TEXT"
-        | Bool -> "BOOLEAN"
-        | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
+        | Int64 _ -> "BIGINT"
         | Float -> "REAL"
         | Double -> "DOUBLE PRECISION"
+        | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
+        | String (Some maxLength) -> sprintf "VARCHAR(%d)" maxLength
+        | String None -> "TEXT"
+        | Text -> "TEXT"
+        | Bool -> "BOOLEAN"
         | DateTime -> "TIMESTAMP"
         | Date -> "DATE"
         | Byte -> "SMALLINT"
         | ByteArray _ -> "BYTEA"
         | Binary _ -> "BYTEA"
-        | Text -> "TEXT"
+        | Guid -> "UUID"
 
     let private generateCreateTableScript (table: TableMetadata) =
         let columnsSql =

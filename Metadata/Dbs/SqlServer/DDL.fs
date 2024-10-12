@@ -5,21 +5,25 @@ module DDL =
     open Metadata.Metadata
     open Microsoft.Data.SqlClient
 
-    let private sqlColumnTypeToSqlServerType (colType: SqlColumnType) =
+    let private sqlColumnTypeToSqlServerType (colType: SqlType) =
         match colType with
         | Int _ -> "INT"
-        | String (Some maxLength) -> sprintf "NVARCHAR(%d)" maxLength
-        | String None -> "NVARCHAR(MAX)"
-        | Bool -> "BIT"
-        | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
+        | Int64 _ -> "BIGINT"
         | Float -> "FLOAT"
-        | Double -> "DOUBLE PRECISION"
-        | DateTime -> "DATETIME"
+        | Double -> "FLOAT"
+        | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
+        | String (Some maxLength) when maxLength <= 4000 -> sprintf "NVARCHAR(%d)" maxLength
+        | String _ -> "NVARCHAR(MAX)"
+        | Text -> "NVARCHAR(MAX)"
+        | Bool -> "BIT"
+        | DateTime -> "DATETIME2"
         | Date -> "DATE"
         | Byte -> "TINYINT"
+        | ByteArray (Some maxLength) when maxLength <= 8000 -> sprintf "VARBINARY(%d)" maxLength
         | ByteArray _ -> "VARBINARY(MAX)"
+        | Binary (Some maxLength) when maxLength <= 8000 -> sprintf "BINARY(%d)" maxLength
         | Binary _ -> "VARBINARY(MAX)"
-        | Text -> "NVARCHAR(MAX)"
+        | Guid -> "UNIQUEIDENTIFIER"
 
     let private generateCreateTableScript (table: TableMetadata) =
         let columnsSql =

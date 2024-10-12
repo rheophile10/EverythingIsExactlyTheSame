@@ -5,21 +5,23 @@ module DDL =
     open Metadata.Metadata
     open Metadata.Env
 
-    let private sqlColumnTypeToSqliteType (colType: SqlColumnType) =
+    let private sqlColumnTypeToSqliteType (colType: SqlType) =
         match colType with
         | Int _ -> "INTEGER"
+        | Int64 _ -> "INTEGER"
+        | Float -> "REAL"
+        | Double -> "REAL"
+        | Decimal _ -> "NUMERIC"
         | String (Some maxLength) -> sprintf "VARCHAR(%d)" maxLength
         | String None -> "TEXT"
-        | Bool -> "BOOLEAN"
-        | Decimal (precision, scale) -> sprintf "DECIMAL(%d, %d)" precision scale
-        | Float -> "REAL"
-        | Double -> "DOUBLE"
-        | DateTime -> "DATETIME"
-        | Date -> "DATE"
-        | Byte -> "TINYINT"
+        | Text -> "TEXT"
+        | Bool -> "INTEGER"
+        | DateTime -> "TEXT"
+        | Date -> "TEXT"
+        | Byte -> "INTEGER"
         | ByteArray _ -> "BLOB"
         | Binary _ -> "BLOB"
-        | Text -> "TEXT"
+        | Guid -> "TEXT"
 
     let private generateCreateTableScript (table: TableMetadata) =
         let columnsSql =

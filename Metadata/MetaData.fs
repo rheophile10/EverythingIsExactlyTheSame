@@ -7,29 +7,42 @@ module Metadata =
         | ForeignKey of table: string * column: string
         | Unique
 
-    type SqlColumnType =
+    type SqlType =
         | Int of scale: int option
-        | String of maxLength: int option
-        | Bool
-        | Decimal of precision: int * scale: int
+        | Int64 of scale: int option
         | Float
         | Double
+        | Decimal of precision: int * scale: int
+        | String of maxLength: int option
+        | Text
+        | Bool
         | DateTime
         | Date
         | Byte
         | ByteArray of maxLength: int option
         | Binary of maxLength: int option
-        | Text
+        | Guid
 
     type ColumnMetadata = {
         Name: string
-        DataType: SqlColumnType
+        DataType: SqlType
         Nullable: bool
         OrdinalPosition: int
         Length: int option
-        DefaultValue: obj option
+        DefaultValue: SqlValue option
         Constraints: Constraint list
     }
+
+    let createColumn name dataType nullable ordinalPosition constraints =
+        { 
+            Name = name
+            DataType = dataType
+            Nullable = nullable
+            OrdinalPosition = ordinalPosition
+            Length = None
+            DefaultValue = None
+            Constraints = constraints 
+        }
 
     type TableMetadata = {
         TableName: string
@@ -41,13 +54,22 @@ module Metadata =
         | Postgres
         | Sqlite
 
-    open System
-
-// let myType = typeof<MyType>
-// let typeName = myType.FullName
-
     type Metadata = {
         connectionStringEnvKey: string        
         TypesToTables: Map<string, TableMetadata> option
         database: Database
     }
+
+    open System.IO
+    open FSharp.Json
+
+    let writeToJson<'T> (data: 'T) (filePath: string) =
+        data
+        |> Json.serialize
+        |> fun json -> File.WriteAllText(filePath, json)
+
+    let loadFromJson<'T> (filePath: string) : 'T =
+        filePath
+        |> File.ReadAllText
+        |> Json.deserialize<'T>
+

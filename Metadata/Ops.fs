@@ -5,50 +5,106 @@ module Ops =
     open Metadata.Metadata
     open Metadata.Env
     
-    open System.Text.Json
+    open FSharp.Json
     open System.Data  
-    open System.Collections.Generic
+
+    let convertReaderToDataTable (reader: IDataReader) : DataTable =
+        let dataTable = new DataTable()
+        dataTable.Load(reader)
+        reader.Close()
+        dataTable
+
+    let convertReaderToSequence (reader: IDataReader) : seq<Map<string, obj>> =
+        Seq.initInfinite (fun _ -> reader.Read())
+        |> Seq.takeWhile id
+        |> Seq.map (fun _ ->
+            Seq.init reader.FieldCount (fun i -> 
+                let value = if reader.IsDBNull(i) then null else reader.GetValue(i)
+                reader.GetName(i), value
+            )
+            |> Map.ofSeq  
+        )
+        |> fun sequenceOfRows -> 
+            reader.Close()  
+            sequenceOfRows
+
+    let convertReaderToJson (reader: IDataReader) : string =
+        reader
+        |> convertReaderToSequence
+        |> Json.serialize
+    
+    open Npgsql
+    open Microsoft.Data.SqlClient
+    open Microsoft.Data.Sqlite
+
+    let addParameter (cmd: IDbCommand) (name: string, value: obj) =
+        match cmd with
+        | :? NpgsqlCommand as npgsqlCmd -> npgsqlCmd.Parameters.AddWithValue(name, value) |> ignore
+        | :? SqliteCommand as sqliteCmd -> sqliteCmd.Parameters.AddWithValue(name, value) |> ignore
+        | :? SqlCommand as sqlCmd -> sqlCmd.Parameters.AddWithValue(name, value) |> ignore
+        | _ -> failwith "Unsupported command type"
+
+    let createConnectionAndCommand 
+        (dbType: Database) 
+        (connString: string) 
+        (query: string) 
+        : IDbConnection * IDbCommand =
+        match dbType with
+        | Postgres ->
+            let conn = new NpgsqlConnection(connString) :> IDbConnection
+            let cmd = new NpgsqlCommand(query) :> IDbCommand
+            conn, cmd
+        | Sqlite ->
+            let conn = new SqliteConnection(connString) :> IDbConnection
+            let cmd = new SqliteCommand(query) :> IDbCommand
+            conn, cmd
+        | SqlServer ->
+            let conn = new SqlConnection(connString) :> IDbConnection
+            let cmd = new SqlCommand(query) :> IDbCommand
+            conn, cmd
+
+    let getReader 
+        (dbType: Database) 
+        (connString: string) 
+        (query: string) 
+        (parameters: (string * obj) list) 
+        : IDataReader =
+        let conn, cmd = createConnectionAndCommand dbType connString query
+        conn.Open()
+        cmd.Connection <- conn
+        parameters |> List.iter (fun (name, value) -> addParameter cmd (name, value))
+        cmd.ExecuteReader()
 
     type OutData =
         | Reader of IDataReader
         | DataTable of DataTable
-        | Collection of List<Dictionary<string, obj>>
+        | Sequence of seq<Map<string, obj>>
         | Json of string
-    
-    open Metadata.Dbs.Postgres.DQL
-    open Metadata.Dbs.Sqlite.DQL
-    open Metadata.Dbs.SqlServer.DQL
-    
+
     let dql 
         (connString: string) 
         (query: string) 
         (parameters: (string * obj) list) 
-        (dbType: Metadata.Metadata.Database)
+        (dbType: Database)
         (outData: OutData)
         : OutData =
         
-        match dbType with
-        | Postgres ->
-            let reader = Metadata.Dbs.Postgres.DQL.getReader connString query parameters :?> Npgsql.NpgsqlDataReader
-            match outData with
-            | Reader _ -> Reader reader
-            | DataTable _ -> DataTable (Metadata.Dbs.Postgres.DQL.convertReaderToDataTable reader)
-            | Collection _ -> Collection (Metadata.Dbs.Postgres.DQL.convertReaderToCollection reader)
-            | Json _ -> Json (Metadata.Dbs.Postgres.DQL.convertReaderToJson reader)
-        | Sqlite ->
-            let reader = Metadata.Dbs.Sqlite.DQL.getReader connString query parameters 
-            match outData with
-            | Reader _ -> Reader reader
-            | DataTable _ -> DataTable (Metadata.Dbs.Sqlite.DQL.convertReaderToDataTable reader)
-            | Collection _ -> Collection (Metadata.Dbs.Sqlite.DQL.convertReaderToCollection reader)
-            | Json _ -> Json (Metadata.Dbs.Sqlite.DQL.convertReaderToJson reader)
-        | SqlServer ->
-            let reader = Metadata.Dbs.SqlServer.DQL.getReader connString query parameters
-            match outData with
-            | Reader _ -> Reader reader
-            | DataTable _ -> DataTable (Metadata.Dbs.SqlServer.DQL.convertReaderToDataTable reader)
-            | Collection _ -> Collection (Metadata.Dbs.SqlServer.DQL.convertReaderToCollection reader)
-            | Json _ -> Json (Metadata.Dbs.SqlServer.DQL.convertReaderToJson reader)
+        let readerFunc = getReader dbType connString query parameters
+
+        match outData with
+        | Reader _ -> Reader readerFunc
+        | DataTable _ -> 
+            readerFunc 
+            |> convertReaderToDataTable
+            |> DataTable
+        | Sequence _ -> 
+            readerFunc 
+            |> convertReaderToSequence
+            |> Sequence
+        | Json _ -> 
+            readerFunc 
+            |> convertReaderToJson
+            |> Json
 
     open Metadata.Dbs.Postgres.DML
     open Metadata.Dbs.Sqlite.DML
