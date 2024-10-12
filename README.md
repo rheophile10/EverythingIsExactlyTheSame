@@ -32,4 +32,6 @@ type DbContextName(options: DbContextOptions<DbContextName>) =
 
 ```
 
-<img src="metadata.png" alt=":|" style="display: block; margin: auto;" />
+I want metadata without oop
+
+<img src="metadata.png" alt="just a man and his pets appreciating the metadata" style="display: block; margin: auto;" />
